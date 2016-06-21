@@ -45,4 +45,5 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-*.db
+*.db.DS_Store
+.DS_Store

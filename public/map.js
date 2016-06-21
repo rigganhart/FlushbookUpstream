@@ -4,27 +4,17 @@ function initMap() {
 
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 32.7765, lng: -79.9311},
-    zoom: 4
-  });
-  var marker = new google.maps.Marker({
-    position: myLatLng,
-    map: map,
-    title: 'Charleston'
+    zoom: 16
   });
 }
-$('form').on('submit', function(event){
-  event.preventDefault();
-  codeAddress();
-  var restroom = {
-    facility:"",
-    address: "",
-    latitude: num,
-    longitude: num,
-    access: num,
-    capacity: num,
-    cleanliness: num,
-  }
-})
+
+function newMarker(item) {
+  var marker = new google.maps.Marker({
+    position: {lat:  Number(item.lat), lng: Number(item.lon)},
+    map: window.map,
+    title: item.facility
+  });
+}
 
 function codeAddress() {
     var address = document.getElementById("address").value;

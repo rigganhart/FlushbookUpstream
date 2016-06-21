@@ -1,12 +1,20 @@
+// to test on another server;
+// copy paste http://tiny-tiny.herokuapp.com/collections/flushbook into urls
+// on line 37 replace: mainPage.create(JSON.stringify((restroom));
+//            with : mainPage.create(restroom)
+// on line 73 comment out data = JSON.parse(data);
+// also on line 78 try uncommenting the new marker function. this function is what will put the marek on the map
+
+
+
+
 $(document).ready(function() {
     mainPage.init();
 
 })
 // api key: AIzaSyCmljv68nIytDeweNCQXnOGt7_Z3Rz9Neo
 var mainPage = {
-    // name: login name stuff,
-    //url: server url,
-    // objects: array or objects to GET POST PUT DELETE,
+    restroom: [],
     // don't forget The commas!!!!!!!!
     init(){
       mainPage.styling();
@@ -18,29 +26,32 @@ var mainPage = {
 
     //end of styling
     events(){
-      $('form').on('submit', function(event){
+      $('form button').on('click', function(event){
         event.preventDefault();
-        codeAddress();
+        // codeAddress();
         var restroom = {
           facility:$('input[name="facility"]').val(),
           address: $('input[name="address"]').val(),
-          latitude: $('input[name="lat"]').val(),
-          longitude: $('input[name="lon"]').val(),
+          lat: $('input[name="lat"]').val(),
+          lon: $('input[name="lon"]').val(),
           access: $('input[name="access"]').val(),
           capacity: $('input[name="capacity"]').val(),
           cleanliness: 0,
         }
+        console.log(restroom);
         mainPage.create(JSON.stringify(restroom));
+        mainPage.read();
       })
     },
     //end of events
 
     //crud ajax functions
-    create(){
-        $.ajax({
-            url:"localhost4567",
+    create(restroomObject){
+        $.post({
+            contentType: "application/json; charset=utf-8",
+            url:"/flush",
             method: "POST",
-            data: restroom,
+            data: restroomObject,
             success(data) {
                 console.log("created", data);
             },
@@ -53,19 +64,18 @@ var mainPage = {
 
     read() {
         $.ajax({
-            url:"localhost4567",
+            url:"/flush",
             method: "GET",
 
             success(data) {
                 console.log("we got it", data);
+                $('.locationTracker ul').html("");
+
                 data = JSON.parse(data);
+                data.reverse();
                 data.forEach(function(item) {
-          var marker = new google.maps.Marker({
-            position: {lat: item.lat, lng: item.lon},
-            map: window.map,
-            title: item.facility
-          });
-          $('.listOfToilets').append(`<li>${item.address} ${item.lat} ${item.lon} ${item.access} ${item.capacity} ${item.cleanliness}</li>`)
+          $('.locationTracker ul').append(`<li data-id=${item._id}>${item.facility} ${item.lat} ${item.lon}  ${item.capacity} ${item.cleanliness} <button type="button" name="update">Update</button><button type="button" name="Delete">Delete</button></li>`);
+            // newMarker(item);
         })
       },
             error(err){
@@ -76,9 +86,9 @@ var mainPage = {
   },
 // end of read
 
-    update(){
+    update(updateId){
         $.ajax({
-            url:`localhost4567`,
+            url:`/flush/`+updateId,
             method: "PUT",
 
             success(data) {
@@ -93,7 +103,7 @@ var mainPage = {
 
     destroy(deleteId) {
         $.ajax({
-            url:"localhost4567",
+            url:"/flush/"+deleteId,
             method: "DELETE",
 
             success(data) {
